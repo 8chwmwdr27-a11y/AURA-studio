@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>AURA-STUDIO | Users Engine</title>
+</head>
+<body>
+    <script>
+        // 1. מבנה נתונים גלובלי - טעינה מהזיכרון המקומי
+        const AURA_DB = {
+            
+            // פונקציה לרישום משתמש חדש (מיועד לשימוש ב-signin.html)
+            registerUser: function(username, email, password) {
+                let users = JSON.parse(localStorage.getItem('aura_users')) || [];
+                
+                // בדיקה אם המשתמש כבר קיים
+                if (users.find(u => u.email === email)) {
+                    return { success: false, msg: "User already exists" };
+                }
+
+                const newUser = {
+                    username: username,
+                    email: email,
+                    password: password,
+                    regDate: new Date().toLocaleDateString(),
+                    lastLogin: null,
+                    isVerified: true
+                };
+
+                users.push(newUser);
+                localStorage.setItem('aura_users', JSON.stringify(users));
+                console.log("AURA-CORE: New user registered:", username);
+                return { success: true };
+            },
+
+            // פונקציית התחברות (מיועד לשימוש ב-log.html)
+            loginUser: function(username, password) {
+                let users = JSON.parse(localStorage.getItem('aura_users')) || [];
+                const user = users.find(u => u.username === username && u.password === password);
+
+                if (user) {
+                    user.lastLogin = new Date().toLocaleString();
+                    localStorage.setItem('aura_users', JSON.stringify(users));
+                    localStorage.setItem('aura_current_user', JSON.stringify(user)); // שמירת המשתמש המחובר כרגע
+                    return { success: true };
+                }
+                return { success: false, msg: "Invalid credentials" };
+            },
+
+            // פונקציה למשיכת נתוני הפרופיל (מיועד לשימוש ב-profile.html)
+            getCurrentUser: function() {
+                return JSON.parse(localStorage.getItem('aura_current_user'));
+            },
+
+            // התנתקות
+            logout: function() {
+                localStorage.removeItem('aura_current_user');
+                window.location.href = 'log.html';
+            }
+        };
+
+        // חשיפת האובייקט לחלונית הגלובלית כדי שדפים אחרים יוכלו לקרוא לו
+        window.AuraEngine = AURA_DB;
+    </script>
+</body>
+</html>

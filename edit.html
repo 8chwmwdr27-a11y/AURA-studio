@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>AURA-STUDIO | Edit Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --bg-dark: #020202;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --apple-ease: cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        html, body {
+            height: 100%; width: 100vw;
+            background: var(--bg-dark);
+            color: white; margin: 0; padding: 0;
+            overflow-x: hidden; position: fixed;
+        }
+
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        .main-scroll-container {
+            height: 100%; width: 100%;
+            overflow-y: auto; overflow-x: hidden;
+            display: flex; flex-direction: column; align-items: center;
+            padding-bottom: 80px;
+            scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+        }
+        
+        .main-scroll-container::-webkit-scrollbar { width: 3px; }
+        .main-scroll-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        /* לוגו המותג */
+        .logo-header { margin: 30px 0; z-index: 100; flex-shrink: 0; }
+        .electronic-frame {
+            position: relative; padding: 12px 25px; background: rgba(10, 10, 10, 0.8);
+            border-radius: 12px; display: flex; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden; box-shadow: 0 0 25px rgba(0,0,0,0.7);
+        }
+        .electronic-frame::before {
+            content: ''; position: absolute; width: 150px; height: 150px;
+            background: conic-gradient(transparent, transparent, var(--neon-blue), var(--neon-purple), transparent);
+            animation: trappedLight 2s linear infinite; z-index: 1;
+        }
+        .electronic-frame::after { content: ''; position: absolute; inset: 2px; background: var(--bg-dark); border-radius: 10px; z-index: 2; }
+        .logo-content { position: relative; z-index: 3; display: flex; align-items: center; gap: 10px; }
+        @keyframes trappedLight { 0% { transform: rotate(0deg) scale(2); } 100% { transform: rotate(360deg) scale(2); } }
+
+        /* כותרת */
+        .headline-aura { text-align: center; margin-bottom: 20px; }
+        .headline-aura h1 {
+            font-size: 1.5rem; font-weight: 600; text-shadow: 0 0 15px rgba(255,255,255,0.3);
+            padding: 8px 25px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50px;
+            background: var(--glass); display: inline-block; letter-spacing: 1px;
+        }
+
+        /* אווטאר */
+        .avatar-wrapper { position: relative; z-index: 50; margin-bottom: -55px; }
+        .profile-circle {
+            width: 110px; height: 110px; border-radius: 50%;
+            border: 2px solid var(--neon-blue); object-fit: cover;
+            background: #111; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transition: 0.5s var(--apple-ease);
+        }
+        .sync-btn {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 38px; height: 38px; background: var(--neon-blue); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 3px solid var(--bg-dark); cursor: pointer; transition: 0.3s;
+        }
+        .sync-btn svg { width: 18px; height: 18px; fill: #000; }
+
+        /* קונטיינר מרכזי */
+        .edit-card {
+            width: 90%; max-width: 420px; background: var(--glass);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            border-radius: 35px; border: 1px solid var(--border);
+            padding: 70px 25px 30px 25px; margin-bottom: 40px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        }
+
+        .input-block { margin-bottom: 20px; text-align: right; }
+        .block-label { font-size: 0.8rem; font-weight: 600; margin-bottom: 8px; display: block; color: rgba(255,255,255,0.5); }
+        .input-aura-wrap { position: relative; display: flex; align-items: center; }
+        
+        input {
+            width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+            padding: 14px 15px; border-radius: 18px; color: white; outline: none;
+            transition: 0.3s; font-size: 0.9rem; text-align: right;
+        }
+        input:focus { border-color: var(--neon-blue); background: rgba(255,255,255,0.08); }
+
+        .pro-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 18px 0; }
+        .v-indicator { position: absolute; left: 15px; color: #00ff88; opacity: 0; transition: 0.3s; font-weight: bold; }
+        .eye-icon { position: absolute; left: 15px; cursor: pointer; opacity: 0.4; font-size: 1.1rem; }
+
+        .id-container { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 12px 18px; border-radius: 20px; border: 1px solid var(--border); }
+        .copy-pill { background: var(--neon-blue); border: none; padding: 6px 14px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; cursor: pointer; color: black; }
+
+        /* כפתור עדכון */
+        .btn-update {
+            width: 100%; margin-top: 25px; padding: 18px; border-radius: 22px;
+            border: none; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); 
+            font-weight: 600; cursor: not-allowed; transition: 0.4s;
+        }
+        .btn-update.active { background: #fff; color: #000; cursor: pointer; opacity: 1; box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
+
+        /* חתימה בתחתית */
+        .sec-footer { display: flex; align-items: center; gap: 8px; font-size: 0.6rem; color: rgba(255,255,255,0.2); margin-top: auto; padding-bottom: 20px; letter-spacing: 1px; }
+        .live-dot { width: 6px; height: 6px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 10px #00ff88; animation: aura-blink 1.5s infinite; }
+        
+        @keyframes aura-blink { 50% { opacity: 0.3; transform: scale(0.8); } }
+        
+        #auraToast {
+            position: fixed; top: -60px; left: 50%; transform: translateX(-50%);
+            background: #fff; color: #000; padding: 12px 25px; border-radius: 50px;
+            font-weight: 600; z-index: 9999; transition: 0.5s var(--apple-ease); display: flex; align-items: center; gap: 10px;
+        }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000;
+            display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+
+    <iframe src="users.html" id="dbEngine" style="display:none;"></iframe>
+
+    <div id="auraToast"><span>✓</span> הועתק לקליפבורד</div>
+
+    <div class="main-scroll-container">
+        
+        <header class="logo-header">
+            <div class="electronic-frame">
+                <div class="logo-content">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00f2ff" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+                    <span style="font-size: 0.9rem; font-weight: 600; letter-spacing: 2px;">AURA-studio</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="headline-aura"><h1>ערוך את הפרופיל.</h1></div>
+
+        <div class="avatar-wrapper">
+            <img id="avatarMain" src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Aura" class="profile-circle">
+            <label for="imgField" class="sync-btn">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5-5l5 5m-5-5v12"/></svg>
+            </label>
+            <input type="file" id="imgField" hidden accept="image/*" onchange="uploadAvatar(this)">
+        </div>
+
+        <div id="loadTxt" style="font-size: 0.7rem; color: var(--neon-blue); margin-top: 60px; height: 15px; font-weight: 600;"></div>
+
+        <div class="edit-card">
+            <div class="input-block">
+                <label class="block-label">שם המשתמש הנוכחי: <b id="oldName" style="color:white;">---</b></label>
+                <div class="input-aura-wrap">
+                    <input type="text" id="inName" placeholder="החלף את שם המשתמש..." maxlength="10">
+                    <span class="v-indicator" id="vName">✓</span>
+                </div>
+            </div>
+
+            <div class="pro-divider"></div>
+
+            <div class="input-block">
+                <label class="block-label">כתובת אימייל נוכחית: <b id="oldEmail" style="color:white;">---</b></label>
+                <div class="input-aura-wrap">
+                    <input type="text" id="inEmail" placeholder="החלף את המייל..." maxlength="25">
+                    <span class="v-indicator" id="vEmail">✓</span>
+                </div>
+            </div>
+
+            <div class="pro-divider"></div>
+
+            <div class="input-block">
+                <label class="block-label">סיסמה מאובטחת:</label>
+                <div class="input-aura-wrap">
+                    <input type="password" id="inPass" placeholder="החלף את הסיסמה שלך..." maxlength="8">
+                    <span class="eye-icon" onclick="toggleView()">👁️</span>
+                    <span class="v-indicator" id="vPass" style="left:45px;">✓</span>
+                </div>
+            </div>
+
+            <div class="pro-divider"></div>
+
+            <div class="id-container">
+                <span style="font-size: 0.7rem; color: rgba(255,255,255,0.4);">USER ID: <b id="auraID" style="color:var(--neon-blue);">#----</b></span>
+                <button class="copy-pill" onclick="copyID()">COPY</button>
+            </div>
+
+            <button class="btn-update" id="mainBtn" onclick="runUpdate()">
+                <span id="btnLabel">שנה משהו כדי לעדכן...</span>
+            </button>
+        </div>
+
+        <footer class="sec-footer">
+            <div class="live-dot"></div>
+            <span>AURA SECURITY SIGNATURE | SECURE SESSION ACTIVE</span>
+        </footer>
+    </div>
+
+    <div class="modal-overlay" id="modalFinal">
+        <div class="electronic-frame" style="margin-bottom:30px;">
+            <div class="logo-content"><span style="color:white; letter-spacing:2px; font-weight:600;">AURA-studio</span></div>
+        </div>
+        <div style="background:var(--glass); border:1px solid var(--border); border-radius:30px; padding:35px; width:85%; max-width:360px; text-align:center;">
+            <h2 style="color:var(--neon-blue); margin-bottom:15px; font-size:1.3rem;">הנתונים עודכנו</h2>
+            <div id="finalLog" style="font-size:0.8rem; line-height:1.7; color:rgba(255,255,255,0.6); text-align:right; margin-bottom:30px;"></div>
+            <button onclick="finishProcess()" style="width:100%; padding:15px; border-radius:15px; background:white; border:none; font-weight:700; cursor:pointer;">אישור וחזרה</button>
+        </div>
+    </div>
+
+    <script>
+        let currentU = null;
+        let hasImgChange = false;
+
+        // טעינת מידע ללא זריקה החוצה
+        window.onload = () => {
+            // ניסיון משיכה מ-LocalStorage
+            const session = localStorage.getItem('aura_logged_user');
+            
+            if (session) {
+                currentU = JSON.parse(session);
+                // עדכון ממשק
+                document.getElementById('oldName').innerText = currentU.username;
+                document.getElementById('oldEmail').innerText = currentU.email;
+                document.getElementById('auraID').innerText = currentU.id || "#USER-AX";
+                
+                const savedImg = localStorage.getItem(`aura_pfp_${currentU.username}`);
+                if(savedImg) document.getElementById('avatarMain').src = savedImg;
+            } else {
+                // מצב פיתוח/חירום - אל תפנה ל-log.html אם אנחנו בבנייה
+                console.warn("AURA-LOG: No active session found. Preview mode active.");
+                document.getElementById('oldName').innerText = "Guest_Developer";
+                document.getElementById('oldEmail').innerText = "dev@aura.studio";
+            }
+        };
+
+        function uploadAvatar(input) {
+            if (input.files && input.files[0]) {
+                const txt = document.getElementById('loadTxt');
+                txt.innerText = "מעלה תמונה... 100%";
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('avatarMain').src = e.target.result;
+                    if(currentU) localStorage.setItem(`aura_pfp_${currentU.username}`, e.target.result);
+                    hasImgChange = true;
+                    validateFields();
+                    setTimeout(() => { txt.innerText = "SUCCESS ✓"; }, 500);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        const inName = document.getElementById('inName');
+        const inEmail = document.getElementById('inEmail');
+        const inPass = document.getElementById('inPass');
+
+        function validateFields() {
+            const btn = document.getElementById('mainBtn');
+            const label = document.getElementById('btnLabel');
+            
+            const n = inName.value.trim();
+            const e = inEmail.value.trim();
+            const p = inPass.value.trim();
+
+            // חיווי וי
+            document.getElementById('vName').style.opacity = (n.length >= 3) ? '1' : '0';
+            document.getElementById('vEmail').style.opacity = (e.includes('@')) ? '1' : '0';
+            document.getElementById('vPass').style.opacity = (p.length >= 6) ? '1' : '0';
+
+            if (n || e || p || hasImgChange) {
+                btn.classList.add('active');
+                label.innerText = "עדכן נתונים";
+            } else {
+                btn.classList.remove('active');
+                label.innerText = "שנה משהו כדי לעדכן...";
+            }
+        }
+
+        inName.oninput = validateFields;
+        inEmail.oninput = validateFields;
+        inPass.oninput = validateFields;
+
+        function copyID() {
+            navigator.clipboard.writeText(document.getElementById('auraID').innerText);
+            const t = document.getElementById('auraToast');
+            t.style.top = '30px';
+            setTimeout(() => t.style.top = '-60px', 2000);
+        }
+
+        function toggleView() { inPass.type = inPass.type === 'password' ? 'text' : 'password'; }
+
+        function runUpdate() {
+            if(!document.getElementById('mainBtn').classList.contains('active')) return;
+            
+            const updated = {
+                ...currentU,
+                username: inName.value || (currentU ? currentU.username : "Guest"),
+                email: inEmail.value || (currentU ? currentU.email : "dev@aura.studio")
+            };
+
+            document.getElementById('finalLog').innerHTML = `
+                שם חדש: <b>${updated.username}</b><br>
+                מייל חדש: <b>${updated.email}</b><br>
+                סטטוס: <b>SYNCHRONIZED</b>
+            `;
+            
+            if(currentU) localStorage.setItem('aura_logged_user', JSON.stringify(updated));
+            document.getElementById('modalFinal').style.display = 'flex';
+        }
+
+        function finishProcess() {
+            window.location.href = 'profile.html';
+        }
+    </script>
+</body>
+</html>

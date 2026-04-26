@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>AURA-STUDIO | Report Issue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --bg-dark: #020202;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --apple-ease: cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-dark);
+            height: 100vh; width: 100vw;
+            display: flex; flex-direction: column; align-items: center;
+            color: white; overflow: hidden; position: fixed;
+        }
+
+        /* לוגו אלקטרוני - זהה ל-ptiha.html */
+        .logo-header { margin-top: 30px; z-index: 100; }
+        .electronic-frame {
+            position: relative; padding: 12px 25px; background: rgba(10, 10, 10, 0.8);
+            border-radius: 12px; display: flex; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden; box-shadow: 0 0 25px rgba(0,0,0,0.7);
+        }
+        .electronic-frame::before {
+            content: ''; position: absolute; width: 150px; height: 150px;
+            background: conic-gradient(transparent, transparent, var(--neon-blue), var(--neon-purple), transparent);
+            animation: trappedLight 2s linear infinite; z-index: 1;
+        }
+        .electronic-frame::after {
+            content: ''; position: absolute; inset: 2px; background: var(--bg-dark);
+            border-radius: 10px; z-index: 2;
+        }
+        .logo-content { position: relative; z-index: 3; display: flex; align-items: center; gap: 10px; }
+        .logo-text-brand { font-size: 1rem; font-weight: 600; letter-spacing: 2px; color: #fff; }
+        @keyframes trappedLight { 0% { transform: rotate(0deg) scale(2); } 100% { transform: rotate(360deg) scale(2); } }
+
+        /* כותרת מעוצבת */
+        .headline-section {
+            text-align: center; margin-top: 25px; z-index: 10; padding: 0 20px;
+        }
+        .headline-section h1 {
+            font-size: 2.2rem; font-weight: 600;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2), 0 5px 15px rgba(0,0,0,0.5);
+            color: #fff; margin-bottom: 10px;
+        }
+        .glow-line {
+            width: 60px; height: 4px; background: #fff; margin: 0 auto;
+            border-radius: 10px; box-shadow: 0 0 15px #fff;
+        }
+        .sub-text {
+            margin-top: 15px; font-size: 0.85rem; color: rgba(255,255,255,0.6);
+            max-width: 300px; line-height: 1.5; font-weight: 300;
+        }
+
+        /* קונטיינר דיווח */
+        .report-container {
+            margin-top: 25px; width: 90%; max-width: 400px;
+            background: var(--glass); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            border-radius: 28px; border: 1px solid var(--border);
+            padding: 25px; z-index: 10;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(0, 242, 255, 0.05);
+        }
+
+        .form-group { margin-bottom: 18px; position: relative; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; color: var(--neon-blue); }
+        
+        input, select, textarea {
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            padding: 14px; border-radius: 12px; color: white; outline: none;
+            transition: var(--apple-ease) 0.4s; font-size: 0.95rem;
+        }
+        input:focus, textarea:focus { border-color: var(--neon-blue); background: rgba(255,255,255,0.08); }
+        
+        .error-msg { color: #ff4d4d; font-size: 0.7rem; margin-top: 5px; display: none; font-weight: 600; }
+        
+        .verified-icon {
+            position: absolute; left: 12px; top: 38px; color: #00ff88; 
+            opacity: 0; transition: 0.3s; pointer-events: none;
+            width: 18px; height: 18px; background: rgba(0,255,136,0.1);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;
+        }
+
+        /* כפתור שלח */
+        .send-btn {
+            width: 100%; margin-top: 10px; padding: 16px; border-radius: 14px;
+            border: none; background: #fff; color: #000; font-weight: 600;
+            cursor: pointer; transition: var(--apple-ease) 0.4s;
+        }
+        .send-btn:hover { transform: scale(1.02); background: var(--neon-blue); }
+
+        /* מודאל סוכן Agar */
+        .agar-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
+            padding: 20px; backdrop-filter: blur(10px);
+        }
+        .agar-box {
+            background: #0a0a0a; border: 1px solid var(--neon-purple);
+            border-radius: 24px; padding: 30px; width: 100%; max-width: 350px;
+            text-align: center; box-shadow: 0 0 40px rgba(188, 19, 254, 0.2);
+        }
+        .agar-box h3 { color: var(--neon-purple); margin-bottom: 15px; font-weight: 600; }
+        .agar-box p { font-size: 0.9rem; line-height: 1.6; color: rgba(255,255,255,0.8); margin-bottom: 25px; }
+        
+        .confirm-btn {
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--neon-purple);
+            background: transparent; color: white; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        /* חותמת אבטחה */
+        .footer-security {
+            position: absolute; bottom: 20px; display: flex; align-items: center; gap: 8px;
+            font-size: 0.65rem; color: rgba(255,255,255,0.3); letter-spacing: 1px;
+        }
+        .dot-live { width: 6px; height: 6px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 8px #00ff88; animation: blink 1.5s infinite; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes blink { 50% { opacity: 0.3; } }
+    </style>
+</head>
+<body>
+
+    <header class="logo-header">
+        <div class="electronic-frame">
+            <div class="logo-content">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00f2ff" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+                <span class="logo-text-brand">AURA-studio</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="headline-section">
+        <h1>נשמח לשמוע.</h1>
+        <div class="glow-line"></div>
+        <p class="sub-text">Ramo הוא סוכן AI חכם בעל ליבת למידה, הסוכן-Ramo עלול לטעות, אנחנו מצטערים אם נתקלת בבעיה, בבקשה ספר לנו מה התקלה…</p>
+    </div>
+
+    <div class="report-container">
+        <div class="form-group">
+            <label>שם:</label>
+            <input type="text" id="repName" placeholder="שם משתמש" maxlength="10">
+            <div id="nameError" class="error-msg">Only English letters!</div>
+            <div id="nameV" class="verified-icon">✓</div>
+        </div>
+
+        <div class="form-group">
+            <label>על מה נדבר?</label>
+            <select id="repSubject">
+                <option value="סוכן">בעיה עם הסוכן</option>
+                <option value="אתר">בעיה באתר</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>ספר לנו...</label>
+            <textarea id="repDetail" placeholder="פירוט הבעיה..." rows="3" style="resize: none;"></textarea>
+        </div>
+
+        <button class="send-btn" onclick="openAgar()">שלח דיווח</button>
+    </div>
+
+    <div class="agar-modal" id="agarModal">
+        <div class="agar-box">
+            <h3>הודעה מהסוכן Agar</h3>
+            <p id="agarText"></p>
+            <button class="confirm-btn" onclick="processReport(this)">
+                <span id="cBtnText">אישור</span>
+                <div id="loader" style="display:none; width:16px; height:16px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+            </button>
+        </div>
+    </div>
+
+    <footer class="footer-security">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <span>SECURITY VERIFIED</span>
+        <div class="dot-live"></div>
+        <span style="color: #00ff88;">CORE ACTIVE</span>
+    </footer>
+
+    <script>
+        const repName = document.getElementById('repName');
+        const nameError = document.getElementById('nameError');
+        const nameV = document.getElementById('nameV');
+
+        // אימות שם (אנגלית ומספרים בלבד)
+        repName.addEventListener('input', (e) => {
+            const val = e.target.value;
+            const valid = /^[A-Za-z0-9]*$/.test(val);
+            
+            if (!valid) {
+                nameError.style.display = 'block';
+                nameV.style.opacity = '0';
+            } else {
+                nameError.style.display = 'none';
+                if (val.length >= 5) {
+                    nameV.style.opacity = '1';
+                    // אפקט "טעינת הווי"
+                    nameV.style.transform = 'scale(1.2)';
+                    setTimeout(() => nameV.style.transform = 'scale(1)', 200);
+                } else {
+                    nameV.style.opacity = '0';
+                }
+            }
+        });
+
+        function openAgar() {
+            if (repName.value.length < 2 || document.getElementById('repDetail').value.length < 5) return;
+            
+            const sub = document.getElementById('repSubject').value;
+            document.getElementById('agarText').innerText = `שלום אני הסוכן-Agar. הבנתי שהייתה לך בעיה ב${sub}. קיבלתי את הפנייה שלך, אני יפעיל עכשיו תהליך סריקה ניתוח וזיהוי ויציף למפתחים שלי Aura-studio את הבעיה שזיהיתי.`;
+            document.getElementById('agarModal').style.display = 'flex';
+        }
+
+        async function processReport(btn) {
+            const text = document.getElementById('cBtnText');
+            const loader = document.getElementById('loader');
+            
+            text.innerText = 'AUTHENTICATING';
+            loader.style.display = 'block';
+
+            // איסוף נתונים ל-reptext.html (דימוי שליחה)
+            const reportData = {
+                user: repName.value,
+                subject: document.getElementById('repSubject').value,
+                detail: document.getElementById('repDetail').value,
+                agent: "Agar",
+                timestamp: new Date().toISOString()
+            };
+            
+            // שמירה מקומית כדי ש-admin.html יוכל למשוך
+            let reports = JSON.parse(localStorage.getItem('aura_reports') || '[]');
+            reports.push(reportData);
+            localStorage.setItem('aura_reports', JSON.stringify(reports));
+
+            // המתנה של 3 שניות כפי שביקשת
+            setTimeout(() => {
+                document.body.style.transition = '4s cubic-bezier(0.19, 1, 0.22, 1)';
+                document.body.style.opacity = '0';
+                document.body.style.filter = 'blur(20px)';
+                
+                setTimeout(() => {
+                    window.location.href = 'ptiha.html';
+                }, 1000);
+            }, 3000);
+        }
+
+        // מניעת זום ותזוזה
+        document.addEventListener('touchmove', (e) => {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
