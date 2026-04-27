@@ -197,6 +197,15 @@
         const nameError = document.getElementById('nameError');
         const nameV = document.getElementById('nameV');
 
+        // חיבור אוטומטי ליוזר מחובר
+        window.addEventListener('load', () => {
+            const savedUser = JSON.parse(localStorage.getItem('aura_current_user'));
+            if (savedUser && savedUser.username) {
+                repName.value = savedUser.username;
+                nameV.style.opacity = '1';
+            }
+        });
+
         // אימות שם (אנגלית ומספרים בלבד)
         repName.addEventListener('input', (e) => {
             const val = e.target.value;
