@@ -2,65 +2,82 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>AURA-STUDIO | Users Engine</title>
+    <title>AURA-STUDIO | Core Engine</title>
 </head>
 <body>
     <script>
-        // 1. מבנה נתונים גלובלי - טעינה מהזיכרון המקומי
+        /**
+         * AURA CORE ENGINE - v2.0
+         * מנהל את כל הזיכרון המקומי: משתמשים, חיבורים ומפתחות API
+         */
         const AURA_DB = {
             
-            // פונקציה לרישום משתמש חדש (מיועד לשימוש ב-signin.html)
+            // --- ניהול משתמשים ---
+            
             registerUser: function(username, email, password) {
                 let users = JSON.parse(localStorage.getItem('aura_users')) || [];
-                
-                // בדיקה אם המשתמש כבר קיים
                 if (users.find(u => u.email === email)) {
-                    return { success: false, msg: "User already exists" };
+                    return { success: false, msg: "האימייל כבר רשום במערכת" };
                 }
-
                 const newUser = {
-                    username: username,
-                    email: email,
-                    password: password,
+                    username,
+                    email,
+                    password,
                     regDate: new Date().toLocaleDateString(),
-                    lastLogin: null,
-                    isVerified: true
+                    lastLogin: null
                 };
-
                 users.push(newUser);
                 localStorage.setItem('aura_users', JSON.stringify(users));
-                console.log("AURA-CORE: New user registered:", username);
                 return { success: true };
             },
 
-            // פונקציית התחברות (מיועד לשימוש ב-log.html)
             loginUser: function(username, password) {
                 let users = JSON.parse(localStorage.getItem('aura_users')) || [];
                 const user = users.find(u => u.username === username && u.password === password);
-
                 if (user) {
                     user.lastLogin = new Date().toLocaleString();
                     localStorage.setItem('aura_users', JSON.stringify(users));
-                    localStorage.setItem('aura_current_user', JSON.stringify(user)); // שמירת המשתמש המחובר כרגע
+                    localStorage.setItem('aura_current_user', JSON.stringify(user));
                     return { success: true };
                 }
-                return { success: false, msg: "Invalid credentials" };
+                return { success: false, msg: "שם משתמש או סיסמה שגויים" };
             },
 
-            // פונקציה למשיכת נתוני הפרופיל (מיועד לשימוש ב-profile.html)
+            logout: function() {
+                localStorage.removeItem('aura_current_user');
+                window.location.href = 'log.html';
+            },
+
             getCurrentUser: function() {
                 return JSON.parse(localStorage.getItem('aura_current_user'));
             },
 
-            // התנתקות
-            logout: function() {
-                localStorage.removeItem('aura_current_user');
-                window.location.href = 'log.html';
+            // --- ניהול מפתח API (המטרה המרכזית) ---
+
+            saveApiKey: function(key) {
+                if (key && key.trim() !== "") {
+                    localStorage.setItem('AURA_API_KEY', key.trim());
+                    console.log("AURA-CORE: API Key secured in local storage.");
+                    return true;
+                }
+                return false;
+            },
+
+            getApiKey: function() {
+                return localStorage.getItem('AURA_API_KEY');
+            },
+
+            checkConnection: function() {
+                const key = this.getApiKey();
+                return (key !== null && key.length > 10);
             }
         };
 
-        // חשיפת האובייקט לחלונית הגלובלית כדי שדפים אחרים יוכלו לקרוא לו
+        // חשיפה גלובלית לכל הקבצים
         window.AuraEngine = AURA_DB;
+        
+        // הודעת אישור בקונסול לבדיקה
+        console.log("🚀 AURA Engine Active & Linked");
     </script>
 </body>
 </html>
