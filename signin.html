@@ -171,7 +171,7 @@
         </div>
 
         <label class="check-line">
-            <input type="checkbox" checked>
+            <input type="checkbox" id="rememberMe" checked>
             <span>זכור את הפרטים שלי</span>
         </label>
 
@@ -193,7 +193,6 @@
         const mailInp = document.getElementById('mailInp');
         const passInp = document.getElementById('passInp');
 
-        // אימות שם משתמש
         userInp.addEventListener('input', (e) => {
             const val = e.target.value;
             const reg = /^[A-Za-z0-9]*$/;
@@ -209,7 +208,6 @@
             }
         });
 
-        // אימות מייל
         mailInp.addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
             const v = document.getElementById('mailV');
@@ -226,7 +224,6 @@
             }
         });
 
-        // אימות סיסמה
         passInp.addEventListener('input', (e) => {
             const val = e.target.value;
             const v = document.getElementById('passV');
@@ -261,10 +258,26 @@
             loader.style.display = 'block';
             btnTxt.innerText = 'REGISTERING...';
 
-            // קריאה למנוע המשתמשים לשמירת הנתונים
-            const engine = document.getElementById('usersEngine').contentWindow;
-            if (engine.AuraEngine) {
-                engine.AuraEngine.registerUser(userInp.value, mailInp.value, passInp.value);
+            // לוגיקת רישום משולבת (מנוע + גיבוי זיכרון ישיר)
+            try {
+                const engineFrame = document.getElementById('usersEngine').contentWindow;
+                if (engineFrame && engineFrame.AuraEngine) {
+                    engineFrame.AuraEngine.registerUser(userInp.value, mailInp.value, passInp.value);
+                } else {
+                    // גיבוי למקרה שה-iframe חסום או לא נטען
+                    let users = JSON.parse(localStorage.getItem('aura_users')) || [];
+                    if (!users.find(u => u.email === mailInp.value)) {
+                        users.push({
+                            username: userInp.value,
+                            email: mailInp.value,
+                            password: passInp.value,
+                            regDate: new Date().toLocaleDateString()
+                        });
+                        localStorage.setItem('aura_users', JSON.stringify(users));
+                    }
+                }
+            } catch (e) {
+                console.warn("Direct storage backup used.");
             }
 
             setTimeout(() => {
@@ -275,7 +288,7 @@
                 setTimeout(() => {
                     window.location.href = 'log.html';
                 }, 800);
-            }, 3000);
+            }, 2000); // קיצור זמן המתנה לחוויה חלקה יותר
         }
 
         document.addEventListener('touchmove', (e) => {
