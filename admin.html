@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>AURA-STUDIO | Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --bg-dark: #020202;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --apple-ease: cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background: var(--bg-dark); height: 100vh; width: 100vw;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; overflow: hidden; position: fixed;
+        }
+
+        /* מסגרת המותג - אור חשמלי רודף */
+        .brand-frame {
+            position: relative; width: 90%; max-width: 450px; padding: 40px;
+            background: rgba(10, 10, 10, 0.9); border-radius: 24px;
+            display: flex; flex-direction: column; align-items: center; gap: 25px;
+            z-index: 10; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        .brand-frame::before {
+            content: ''; position: absolute; inset: -50%;
+            background: conic-gradient(from 0deg, transparent, var(--neon-purple), var(--neon-blue), transparent);
+            animation: chase 4s linear infinite; z-index: -1;
+        }
+
+        .brand-frame::after {
+            content: ''; position: absolute; inset: 3px;
+            background: var(--bg-dark); border-radius: 21px; z-index: -1;
+        }
+
+        @keyframes chase {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 { font-weight: 300; font-size: 1.1rem; letter-spacing: 1px; color: #fff; text-align: center; }
+
+        /* שדה מילוי עם פולס פנימי */
+        .input-container { width: 100%; position: relative; }
+
+        .api-input {
+            width: 100%; padding: 18px 25px; background: var(--glass);
+            border: 1px solid var(--border); border-radius: 15px;
+            color: white; outline: none; text-align: center; font-size: 0.9rem;
+            transition: 0.4s var(--apple-ease);
+            animation: innerPulse 3s infinite ease-in-out;
+        }
+
+        @keyframes innerPulse {
+            0%, 100% { box-shadow: inset 0 0 5px rgba(0, 242, 255, 0.05); }
+            50% { box-shadow: inset 0 0 15px rgba(188, 19, 254, 0.15); border-color: rgba(188, 19, 254, 0.3); }
+        }
+
+        .api-input:focus { border-color: var(--neon-blue); background: rgba(255,255,255,0.05); }
+
+        /* כפתור חבר מפתח */
+        .connect-btn {
+            width: 100%; padding: 16px; border-radius: 15px; border: none;
+            background: var(--neon-blue); color: #000; font-weight: 600;
+            cursor: pointer; transition: 0.3s var(--apple-ease);
+            position: relative; overflow: hidden;
+        }
+
+        .connect-btn:active { transform: scale(0.96); }
+
+        /* אנימציית טעינה של המותג */
+        .loading-overlay {
+            position: absolute; inset: 0; background: var(--bg-dark);
+            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100;
+        }
+
+        .aura-spinner {
+            width: 60px; height: 60px; border-radius: 50%;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--neon-purple);
+            border-right: 2px solid var(--neon-blue);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* הודעת אישור */
+        .success-toast {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 255, 136, 0.1); border: 1px solid #00ff88;
+            padding: 15px 30px; border-radius: 50px; color: #00ff88;
+            font-size: 0.9rem; backdrop-filter: blur(10px);
+            transition: 0.6s var(--apple-ease); z-index: 1000;
+        }
+
+        .success-toast.show { top: 30px; }
+
+        .back-link {
+            margin-top: 15px; font-size: 0.7rem; color: rgba(255,255,255,0.3);
+            text-decoration: none; letter-spacing: 1px; transition: 0.3s;
+        }
+        .back-link:hover { color: var(--neon-blue); }
+    </style>
+</head>
+<body>
+
+    <div class="success-toast" id="successToast">מפתח חובר בהצלחה לפרוטוקול RAMO</div>
+
+    <div class="brand-frame">
+        <div class="loading-overlay" id="loader">
+            <div class="aura-spinner"></div>
+            <p style="margin-top: 15px; font-size: 0.7rem; letter-spacing: 2px; color: var(--neon-blue);">AURA AUTHENTICATING...</p>
+        </div>
+
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--neon-blue)" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+        
+        <h1>מלא מפתח API לחיבור בינה מלאכותית</h1>
+
+        <div class="input-container">
+            <input type="password" id="apiKeyInput" class="api-input" placeholder="הזן מפתח API כאן..." autocomplete="off">
+        </div>
+
+        <button class="connect-btn" onclick="saveKey()">חבר מפתח</button>
+        
+        <a href="index.html" class="back-link">חזרה לממשק הצ'אט</a>
+    </div>
+
+    <script>
+        // בדיקה אם קיים מפתח כבר וטעינתו לשדה
+        window.onload = () => {
+            const savedKey = localStorage.getItem('AURA_API_KEY');
+            if (savedKey) {
+                document.getElementById('apiKeyInput').value = savedKey;
+            }
+        };
+
+        function saveKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            const loader = document.getElementById('loader');
+            const toast = document.getElementById('successToast');
+
+            if (!key) {
+                alert("אנא הזן מפתח תקין");
+                return;
+            }
+
+            // הפעלת אנימציית טעינה 3 שניות
+            loader.style.display = 'flex';
+
+            setTimeout(() => {
+                // שמירה ב-LocalStorage (כפי שקובץ ה-chat.html מחפש)
+                localStorage.setItem('AURA_API_KEY', key);
+                
+                // הסתרת טעינה
+                loader.style.display = 'none';
+
+                // הצגת הודעת הצלחה לשתי שניות
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    // חזרה אוטומטית לצ'אט אחרי ההצלחה
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 500);
+                }, 2000);
+
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
